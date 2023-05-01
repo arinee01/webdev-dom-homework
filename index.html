@@ -82,7 +82,7 @@
         `<li class="comment">
             <div class="comment-header">
             <div> ${nameInputElement.value} </div>
-            <div> ${formatDate(date)} </div>
+            <div> ${formatDate(dateNow)} </div>
           </div>
           <div class="comment-body">
             <div class="comment-text">
@@ -97,8 +97,7 @@
           </div>
         </li>`;
         nameInputElement.value = '';
-    
-    commentsInputElement.value = '';
+        commentsInputElement.value = '';
     });
     function formatDate(date) {
 
@@ -120,6 +119,3 @@ return dd + '.' + mm + '.' + yy + ' ' + hh + ':' + mi;
 }
   </script>
 </html>
-
-
-
