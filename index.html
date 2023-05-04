@@ -15,7 +15,7 @@
             <div>12.02.22 12:18</div>
           </div>
           <div class="comment-body">
-            <div class="comment-text">
+            <div class="comment-text" data-id="0">
               Это будет первый комментарий на этой странице
             </div>
           </div>
@@ -32,7 +32,7 @@
             <div>13.02.22 19:22</div>
           </div>
           <div class="comment-body">
-            <div class="comment-text">
+            <div class="comment-text" data-id="1">
               Мне нравится как оформлена эта страница! ❤
             </div>
           </div>
@@ -69,36 +69,102 @@
     const buttonElement = document.getElementById('add-form-button');
     const listElement = document.getElementById('comments');
     const nameInputElement = document.getElementById('add-form-name');
+    const addForm = document.querySelector('.add-form');
     const commentsInputElement = document.getElementById('add-form-text');
     let dateNow = new Date();
+    const comments = document.querySelectorAll('.comment');
+    const commentators = [
+    {
+      name: "Глеб Фокин",
+      date: "12.02.22 12:18",
+      msg: "Это будет первый комментарий на этой странице",
+      like: "3",
+      liked: false,
+    },
+    {
+      name: "Варвара Н.",
+      date: "13.02.22 19:22",
+      msg: "Мне нравится как оформлена эта страница! ❤",
+      like: "75",
+      liked: false,
+    },
+    {
+        name: "Арина",
+        date: "02.05.23 15:20",
+        msg: "Комментарий",
+        like: "1",
+        Iliked: true,
+    }
+  ];
+  const addLikes = (e) => {
+    const comment = commentators[e.target.dataset.id];
+    comment.like++;
+    comment.liked = true;
+  }
 
-    buttonElement.addEventListener("click", () => {
-        if(nameInputElement.value === '' || commentsInputElement.value === '') {
-            return;
-        }
-      const oldListHtml = listElement.innerHTML;
-      listElement.innerHTML = 
-      oldListHtml + 
-        `<li class="comment">
-            <div class="comment-header">
-            <div> ${nameInputElement.value} </div>
-            <div> ${formatDate(dateNow)} </div>
+  const delLikes = (e) => {
+    const comment = commentators[e.target.dataset.id];
+    comment.like--;
+    comment.liked = false;
+  }
+  const initLikeClick = () => {
+    const likeClickElements = document.querySelectorAll('.likes');
+    for (const likeClickElement of likeClickElements) {
+      likeClickElement.addEventListener('click', (e) => {
+        (commentators[e.target.dataset.id].liked) ? delLikes(e) : addLikes(e);
+        renderComments();
+      });
+    }
+  }
+  function renderComments() {
+    const commentHtmlResult = commentators.map((comment, id) => {
+      (comment.liked) ? liked = '-active-like' : liked = '';
+      return `<li class="comment" data-id="${id}">
+        <div class="comment-header">
+          <div>${comment.name}</div>         
+          <div>${comment.date}</div>          
+        </div>
+        <div class="comment-body">
+          <div class="comment-text">
+            ${comment.msg}
           </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${commentsInputElement.value}
-            </div>
+        </div>
+        <div class="comment-footer">
+          <div class="likes">
+            <span class="likes-counter" >${comment.like}</span>
+            <button class="like-button ${liked}" data-id="${id}"></button>
           </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>`;
-        nameInputElement.value = '';
-        commentsInputElement.value = '';
-    });
+        </div>
+      </li>`;
+    }).join("");
+    listElement.innerHTML = commentHtmlResult;
+    initLikeClick();
+  }
+
+  function valiate() { 
+  if(nameInputElement.value === '' || commentsInputElement.value === '') {
+            return;}}
+    
+
+    function addComment()  { 
+    const validate = valiate(); 
+    if (validate) { 
+        commentators.push({
+            name: nameInputElement.value,
+            date: formatDate(),
+            msg: commentsInputElement.value,
+            like: 0,
+        });
+  renderComments();
+      commentsInputElement.value = "";
+      buttonElement.setAttribute('disabled', '');
+
+      }}
+
+      buttonElement.addEventListener('click', () => { 
+    addComment();
+});
+  
     function formatDate(date) {
 
 let dd = date.getDate();
@@ -117,5 +183,6 @@ let mi = date.getMinutes() % 100
 if (mi < 10) mi = '0' + mi;
 return dd + '.' + mm + '.' + yy + ' ' + hh + ':' + mi;
 }
+renderComments();
   </script>
 </html>
