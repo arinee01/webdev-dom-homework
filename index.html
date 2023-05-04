@@ -141,9 +141,9 @@
     initLikeClick();
   }
 
-  function valiate() { 
-  if(nameInputElement.value === '' || commentsInputElement.value === '') {
-            return;}}
+  function valiate() {
+      return nameInputElement.value !== '' || commentsInputElement.value !== '';
+    }
     
 
     function addComment()  { 
@@ -151,7 +151,7 @@
     if (validate) { 
         commentators.push({
             name: nameInputElement.value,
-            date: formatDate(),
+            date: formatDate(dateNow),
             msg: commentsInputElement.value,
             like: 0,
         });
