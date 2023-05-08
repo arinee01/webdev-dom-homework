@@ -108,20 +108,23 @@
     comment.liked = false;
   }
   const initLikeClick = () => {
-    const likeClickElements = document.querySelectorAll('.likes');
-    for (const likeClickElement of likeClickElements) {
-      likeClickElement.addEventListener('click', (e) => {
-        (commentators[e.target.dataset.id].liked) ? delLikes(e) : addLikes(e);
-        renderComments();
-      });
-    }
-  }
+  const likeClickElements = document.querySelectorAll('.likes');
+  for (const likeClickElement of likeClickElements) {
+    likeClickElement.addEventListener('click', (e) => {
+      e.stopPropagation();
+      (commentators[e.target.dataset.id].liked) ? delLikes(e) : addLikes(e);
+      renderComments();
+    });
+  };
+};
+initLikeClick();
+
   function renderComments() {
     const commentHtmlResult = commentators.map((comment, id) => {
       (comment.liked) ? liked = '-active-like' : liked = '';
       return `<li class="comment" data-id="${id}">
         <div class="comment-header">
-          <div>${comment.name}</div>         
+          <div class="comment-name">${comment.name}</div>         
           <div>${comment.date}</div>          
         </div>
         <div class="comment-body">
@@ -139,6 +142,7 @@
     }).join("");
     listElement.innerHTML = commentHtmlResult;
     initLikeClick();
+    addCommentListener()
   }
 
   function valiate() {
@@ -148,22 +152,43 @@
 
     function addComment()  { 
     const validate = valiate(); 
-    if (validate) { 
+    if (validate()) { 
         commentators.push({
-            name: nameInputElement.value,
+            name: nameInputElement.valuereplaceAll("<", "&lt;").replaceAll(">", "&gt;"),
             date: formatDate(dateNow),
-            msg: commentsInputElement.value,
+            msg: commentsInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
             like: 0,
         });
   renderComments();
       commentsInputElement.value = "";
       buttonElement.setAttribute('disabled', '');
 
-      }}
+      }};
 
-      buttonElement.addEventListener('click', () => { 
+      buttonElement.addEventListener('click', (event) => { 
     addComment();
 });
+addForm.addEventListener('input', (event) => {
+    if (validate) {
+      buttonElement.removeAttribute('disabled');
+      buttonElement.classList.remove('add-form-button-disabled');
+    }
+  });
+  renderComments();
+
+  function addCommentListener() {
+    const comments = document.querySelectorAll('.comment');
+
+    comments.forEach((comment) => {
+      comment.addEventListener('click', () => {
+        const answer = comment.querySelector('.comment-body').textContent;
+        const nameUser = comment.querySelector('.comment-name').textContent;
+        textComment.value = `>${answer}${nameUser}.,`;
+      });
+    });
+  }
+  addCommentListener();
+
   
     function formatDate(date) {
 
@@ -184,5 +209,6 @@ if (mi < 10) mi = '0' + mi;
 return dd + '.' + mm + '.' + yy + ' ' + hh + ':' + mi;
 }
 renderComments();
+addCommentListener();
   </script>
 </html>
