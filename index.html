@@ -72,7 +72,6 @@
     const addForm = document.querySelector('.add-form');
     const commentsInputElement = document.getElementById('add-form-text');
     let dateNow = new Date();
-    const comments = document.querySelectorAll('.comment');
     const commentators = [
     {
       name: "Глеб Фокин",
@@ -108,16 +107,16 @@
     comment.liked = false;
   }
   const initLikeClick = () => {
-  const likeClickElements = document.querySelectorAll('.likes');
-  for (const likeClickElement of likeClickElements) {
-    likeClickElement.addEventListener('click', (e) => {
-      e.stopPropagation();
-      (commentators[e.target.dataset.id].liked) ? delLikes(e) : addLikes(e);
-      renderComments();
-    });
+    const likeClickElements = document.querySelectorAll('.likes');
+    for (const likeClickElement of likeClickElements) {
+      likeClickElement.addEventListener('click', (e) => {
+        e.stopPropagation();
+        (commentators[e.target.dataset.id].liked) ? delLikes(e) : addLikes(e);
+        renderComments();
+      });
+    };
   };
-};
-initLikeClick();
+
 
   function renderComments() {
     const commentHtmlResult = commentators.map((comment, id) => {
@@ -152,9 +151,9 @@ initLikeClick();
 
     function addComment()  { 
     const validate = valiate(); 
-    if (validate()) { 
+    if (validate) { 
         commentators.push({
-            name: nameInputElement.valuereplaceAll("<", "&lt;").replaceAll(">", "&gt;"),
+            name: nameInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
             date: formatDate(dateNow),
             msg: commentsInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
             like: 0,
@@ -183,7 +182,7 @@ addForm.addEventListener('input', (event) => {
       comment.addEventListener('click', () => {
         const answer = comment.querySelector('.comment-body').textContent;
         const nameUser = comment.querySelector('.comment-name').textContent;
-        textComment.value = `>${answer}${nameUser}.,`;
+        commentsInputElement.value = `>${answer}${nameUser}.,`;
       });
     });
   }
@@ -209,6 +208,6 @@ if (mi < 10) mi = '0' + mi;
 return dd + '.' + mm + '.' + yy + ' ' + hh + ':' + mi;
 }
 renderComments();
-addCommentListener();
+
   </script>
 </html>
