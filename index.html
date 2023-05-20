@@ -72,98 +72,135 @@
     const addForm = document.querySelector('.add-form');
     const commentsInputElement = document.getElementById('add-form-text');
     let dateNow = new Date();
-    const commentators = [
-    {
-      name: "Глеб Фокин",
-      date: "12.02.22 12:18",
-      msg: "Это будет первый комментарий на этой странице",
-      like: "3",
-      liked: false,
-    },
-    {
-      name: "Варвара Н.",
-      date: "13.02.22 19:22",
-      msg: "Мне нравится как оформлена эта страница! ❤",
-      like: "75",
-      liked: false,
-    },
-    {
-        name: "Арина",
-        date: "02.05.23 15:20",
-        msg: "Комментарий",
-        like: "1",
-        Iliked: true,
+    let commentators =  [];
+    function getApi() {
+        const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
+        method: "GET"
+      });
+
+      fetchPromise.then((response) => {
+        const jsonPromise = response.json();
+
+        // Подписываемся на результат преобразования
+        jsonPromise.then((responseData) => {
+          // получили данные и рендерим их в приложении
+          commentators = responseData.comments.map((comment) => {
+            return {
+              name: comment.author.name,
+              date: new Date(comment.date).toLocaleString().slice(0,-3),
+              text: comment.text,
+              likes: comment.likes,
+              ILiked: false,
+            };
+          });
+          comments = commentators
+          renderComments();
+        });
+      });
     }
-  ];
+    getApi();
+
   const addLikes = (e) => {
     const comment = commentators[e.target.dataset.id];
-    comment.like++;
-    comment.liked = true;
+    comment.likes++;
+    comment.Iliked = true;
   }
 
   const delLikes = (e) => {
     const comment = commentators[e.target.dataset.id];
-    comment.like--;
-    comment.liked = false;
+    comment.likes--;
+    comment.Iliked = false;
   }
   const initLikeClick = () => {
     const likeClickElements = document.querySelectorAll('.likes');
     for (const likeClickElement of likeClickElements) {
       likeClickElement.addEventListener('click', (e) => {
         e.stopPropagation();
-        (commentators[e.target.dataset.id].liked) ? delLikes(e) : addLikes(e);
+        (commentators[e.target.dataset.id].Iliked) ? delLikes(e) : addLikes(e);
         renderComments();
       });
     };
   };
+  function addCommentListener() {
+    const comments = document.querySelectorAll('.comment');
+
+    comments.forEach((comment) => {
+      comment.addEventListener('click', () => {
+        const text = comment.querySelector('.comment-body').textContent;
+        const author = comment.querySelector('.comment-name').textContent;
+        commentsInputElement.value = `>${text}${author}.,`;
+      });
+    });
+  }
+  addCommentListener();
+  
 
 
   function renderComments() {
-    const commentHtmlResult = commentators.map((comment, id) => {
-      (comment.liked) ? liked = '-active-like' : liked = '';
-      return `<li class="comment" data-id="${id}">
+    const commentHtmlResult = commentators.map((comment, index) => {
+      (comment.Iliked) ? Iliked = '-active-like' : Iliked = '';
+      return `<li class="comment">
         <div class="comment-header">
           <div class="comment-name">${comment.name}</div>         
           <div>${comment.date}</div>          
         </div>
         <div class="comment-body">
           <div class="comment-text">
-            ${comment.msg}
+            ${comment.text}
           </div>
         </div>
         <div class="comment-footer">
           <div class="likes">
-            <span class="likes-counter" >${comment.like}</span>
-            <button class="like-button ${liked}" data-id="${id}"></button>
+            <span class="likes-counter" >${comment.likes}</span>
+            <button class="like-button ${Iliked}" data-id="${index}"></button>
           </div>
         </div>
       </li>`;
     }).join("");
     listElement.innerHTML = commentHtmlResult;
+   
     initLikeClick();
     addCommentListener()
   }
+  renderComments()
 
   function valiate() {
       return nameInputElement.value !== '' || commentsInputElement.value !== '';
     }
-    
-
-    function addComment()  { 
-    const validate = valiate(); 
-    if (validate) { 
-        commentators.push({
-            name: nameInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
-            date: formatDate(dateNow),
-            msg: commentsInputElement.value.replaceAll("<", "&lt;").replaceAll(">", "&gt;"),
-            like: 0,
+    const addComment = () => {
+      const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
+        method: "POST",
+        body: JSON.stringify({
+          id: 1,
+          date: `${dateNow.toLocaleString().slice(0,-3)}`,
+          likes: 0,
+          ILiked: false,
+          text: `${commentsInputElement.value
+          .replaceAll('<', '&lt;')
+          .replaceAll('<', '&gt;')}`,
+          name: nameInputElement.value
+          .replaceAll('<', '&lt;')
+          .replaceAll('<', '&gt;'), 
+          })
         });
-  renderComments();
+
+      fetchPromise.then((response) => {
+        const jsonPromise = response.json();
+
+        // Подписываемся на результат преобразования
+        jsonPromise.then((responseData) => {
+          // получили данные и рендерим их в приложении
+          commentators = responseData.comments;
+          renderComments();
+        });
+      });
+      getApi();
+      renderComments();
+      addCommentListener();
       commentsInputElement.value = "";
       buttonElement.setAttribute('disabled', '');
 
-      }};
-
+    }
       buttonElement.addEventListener('click', (event) => { 
     addComment();
 });
@@ -174,19 +211,9 @@ addForm.addEventListener('input', (event) => {
     }
   });
   renderComments();
+  getApi()
 
-  function addCommentListener() {
-    const comments = document.querySelectorAll('.comment');
 
-    comments.forEach((comment) => {
-      comment.addEventListener('click', () => {
-        const answer = comment.querySelector('.comment-body').textContent;
-        const nameUser = comment.querySelector('.comment-name').textContent;
-        commentsInputElement.value = `>${answer}${nameUser}.,`;
-      });
-    });
-  }
-  addCommentListener();
 
   
     function formatDate(date) {
