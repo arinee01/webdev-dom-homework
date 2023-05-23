@@ -72,7 +72,7 @@
   let now = new Date();
   let userComments = [];
   function getApi() {
-        const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
+        const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/:gracheva-arina/comments", {
         method: "GET"
       });
 
@@ -92,13 +92,12 @@
             };
           });
           userComments = appComments;
-          console.log(userComments);
           renderComments();
         });
       });
     }
 
-    getApi();
+    
 
     const addLike = (e) => {
       const comment = userComments[e.target.dataset.id];
@@ -166,7 +165,7 @@
     renderComments();
 
     const addComment = () => {
-      const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
+      const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/:gracheva-arina/comments", {
         method: "POST",
         body: JSON.stringify({
           text: `${textAreaComment.value
@@ -187,6 +186,7 @@
           userComments = responseData.comments;
         });
       });
+      getApi();
 
       renderComments();
       answerComment();
