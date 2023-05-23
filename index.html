@@ -97,7 +97,7 @@
       });
     }
 
-    
+    getApi()
 
     const addLike = (e) => {
       const comment = userComments[e.target.dataset.id];
@@ -158,6 +158,7 @@
       }).join('');
 
       boxComments.innerHTML = commentHtml;
+      
       initLikeClick();
       answerComment();
     }
@@ -186,7 +187,7 @@
           userComments = responseData.comments;
         });
       });
-      getApi();
+      
 
       renderComments();
       answerComment();
