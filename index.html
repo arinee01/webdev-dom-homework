@@ -6,83 +6,93 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
 
-<body>
-  <div class="container">
-    <ul class="comments">
-      <li class="comment">
-        <div class="comment-header">
-          <div class="comment-user-name">Глеб Фокин</div>
-          <div class="comment-date">12.02.22 12:18</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">
-            Это будет первый комментарий на этой странице
+  <body>
+    
+    </div>
+    <div class="container">
+      <ul class="comments">
+        <li class="comment">
+          <div class="comment-header">
+            <div class="comment-user-name">Глеб Фокин</div>
+            <div class="comment-date">12.02.22 12:18</div>
           </div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">3</span>
-            <button data-like="0" class="like-button"></button>
+          <div class="comment-body">
+            <div class="comment-text">
+              Это будет первый комментарий на этой странице
+            </div>
           </div>
-        </div>
-      </li>
-      <li class="comment">
-        <div class="comment-header">
-          <div class="comment-user-name">Варвара Н.</div>
-          <div>13.02.22 19:22</div>
-        </div>
-        <div class="comment-body">
-          <div class="comment-text">
-            Мне нравится как оформлена эта страница! ❤
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">3</span>
+              <button data-like="0" class="like-button"></button>
+            </div>
           </div>
-        </div>
-        <div class="comment-footer">
-          <div class="likes">
-            <span class="likes-counter">75</span>
-            <button data-like="0" class="like-button -active-like"></button>
+        </li>
+        <li class="comment">
+          <div class="comment-header">
+            <div class="comment-user-name">Варвара Н.</div>
+            <div>13.02.22 19:22</div>
           </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              Мне нравится как оформлена эта страница! ❤
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">75</span>
+              <button data-like="0" class="like-button -active-like"></button>
+            </div>
+          </div>
+        </li>
+      </ul>
+      <p class="loading">Комментарии загружаются...</p>
+      <div class="add-form">
+        <input
+          type="text"
+          class="add-form-name"
+          placeholder="Введите ваше имя"
+        />
+        <textarea
+          type="textarea"
+          class="add-form-text"
+          placeholder="Введите ваш коментарий"
+          rows="4"
+        ></textarea>
+        <div class="add-form-row">
+          <button class="add-form-button">Написать</button>
         </div>
-      </li>
-    </ul>
-    <div class="add-form">
-      <input
-        type="text"
-        class="add-form-name"
-        placeholder="Введите ваше имя"
-      />
-      <textarea
-        type="textarea"
-        class="add-form-text"
-        placeholder="Введите ваш коментарий"
-        rows="4"
-      ></textarea>
-      <div class="add-form-row">
-        <button class="add-form-button">Написать</button>
       </div>
     </div>
-  </div>
-</body>
-<script>
-  const buttonNewComment = document.querySelector('.add-form-button');
-  const comment = document.querySelector('.comment');
-  const boxComments = document.querySelector('.comments');
-  const inputName = document.querySelector('.add-form-name');
-  const textAreaComment = document.querySelector('.add-form-text');
-  const boxCommentsTexts = boxComments.querySelectorAll('.comment');
-  let now = new Date();
-  let userComments = [];
-  function getApi() {
-        const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/:gracheva-arina/comments", {
+  </body>
+  <script>
+    const buttonNewComment = document.querySelector('.add-form-button');
+    const comment = document.querySelector('.comment');
+    const boxComments = document.querySelector('.comments');
+    const inputName = document.querySelector('.add-form-name');
+    const textAreaComment = document.querySelector('.add-form-text');
+    const boxCommentsTexts = boxComments.querySelectorAll('.comment');
+    const addForm = document.querySelector('.add-form');
+    const loading = document.querySelector('.loading');
+    let now = new Date();
+
+    let userComments = [];
+
+    function getApi() {
+      if (userComments.length === 0) {
+    loading.style.display = 'block';
+    addForm.style.display = 'none';
+  }
+        return fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
         method: "GET"
-      });
+      })
 
-      fetchPromise.then((response) => {
-        const jsonPromise = response.json();
+      .then((response) => {
+        return response.json();
+      })
 
-        // Подписываемся на результат преобразования
-        jsonPromise.then((responseData) => {
-          // получили данные и рендерим их в приложении
-          const appComments = responseData.comments.map((comment) => {
+      .then((responseData) => {
+        const appComments = responseData.comments.map((comment) => {
             return {
               name: comment.author.name,
               date: new Date(comment.date).toLocaleString().slice(0,-3),
@@ -92,18 +102,22 @@
             };
           });
           userComments = appComments;
+          console.log(userComments);
           renderComments();
-        });
-      });
+          loading.style.display = 'none';
+    addForm.style.display = 'block';
+      }) 
+    ;
     }
 
-    getApi()
+    getApi();
 
     const addLike = (e) => {
       const comment = userComments[e.target.dataset.id];
       comment.likes++;
       comment.Iliked = true;
     }
+
     const delLike = (e) => {
       const comment = userComments[e.target.dataset.id];
       comment.likes--;
@@ -120,7 +134,6 @@
         })
       }
     }
-
 
     // Первый вариан ответа на коммент
     const answerComment = () => {
@@ -158,7 +171,6 @@
       }).join('');
 
       boxComments.innerHTML = commentHtml;
-      
       initLikeClick();
       answerComment();
     }
@@ -166,9 +178,16 @@
     renderComments();
 
     const addComment = () => {
-      const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/:gracheva-arina/comments", {
+      buttonNewComment.disabled = true;
+      buttonNewComment.textContent = "Элемент добавлятся...";
+      // Пример, код выше, переписанный на цепочку промисов:
+      const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
         method: "POST",
         body: JSON.stringify({
+          id: 1,
+          date: `${now.toLocaleString().slice(0,-3)}`,
+          likes: 0,
+          isLiked: false,
           text: `${textAreaComment.value
           .replaceAll('<', '&lt;')
           .replaceAll('<', '&gt;')}`,
@@ -176,19 +195,43 @@
           .replaceAll('<', '&lt;')
           .replaceAll('<', '&gt;'), 
           })
-        });
+        })
 
-      fetchPromise.then((response) => {
-        getApi()
-        });
-      
-      
+        .then((response) => {
+          return response.json();
+        })
 
-      renderComments();
-      answerComment();
-      inputName.value = '';
-      textAreaComment.value = '';
-    }
+        .then((responseData) => {
+    const newComment = {
+      name: responseData.comment.author.name,
+      date: new Date(responseData.comment.date).toLocaleString().slice(0,-3),
+      text: responseData.comment.text,
+      likes: responseData.comment.likes,
+      isLiked: false,
+    };
+    userComments.push(newComment); // добавляем новый комментарий в массив
+    return userComments;
+  })
+
+  .then(() => {
+    renderComments();
+  })
+
+  .catch((error) => {
+    console.error(error);
+  })
+
+  .then(() => {
+    buttonNewComment.disabled = false;
+    buttonNewComment.textContent = "Добавить";
+    getApi();
+  });
+  
+  inputName.value = '';
+  textAreaComment.value = '';
+};
+
+
     buttonNewComment.addEventListener('click', function () {
       let oldComments = boxComments.innerHTML;
 
@@ -199,10 +242,11 @@
         textAreaComment.classList.add('error');
         return;
       } else {
+      
         addComment();
         inputName.classList.remove('error');
         textAreaComment.classList.remove('error');
-      }
+        }
     });
   </script>
 </html>
