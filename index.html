@@ -198,6 +198,14 @@
         })
 
         .then((response) => {
+          if (!response.ok) {
+        if (response.status === 500) {
+          throw new Error('Server Error');
+        } else if (response.status === 400) {
+          throw new Error('Имя и комментарий должны быть не короче 3 символов');
+        }
+        throw new Error('Ошибка сервера: ' + response.status);
+      }
           return response.json();
         })
 
@@ -218,6 +226,14 @@
   })
 
   .catch((error) => {
+    if (error.message === 'Server Error') {
+        alert('Сервер сломался, попробуй позже');
+      }  if (error.message === 'Имя и комментарий должны быть не короче 3 символов') {
+        alert('Имя и комментарий должны быть не короче 3 символов');
+      }if (error.message === 'Failed to fetch') {
+        alert('Кажеться у вас сломался интернет, попробуйте позже')
+      } 
+       
     console.error(error);
   })
 
@@ -235,18 +251,14 @@
     buttonNewComment.addEventListener('click', function () {
       let oldComments = boxComments.innerHTML;
 
-      if (inputName.value === '') {
-        inputName.classList.add('error');
-        return;
-      } if (textAreaComment.value === '') {
-        textAreaComment.classList.add('error');
-        return;
-      } else {
-      
-        addComment();
-        inputName.classList.remove('error');
-        textAreaComment.classList.remove('error');
-        }
-    });
+      if (inputName.value.length < 3 || textAreaComment.value.length < 3) {
+    alert('Имя и комментарий должны быть не короче 3 символов');
+    return;
+  } else {
+    addComment();
+    inputName.classList.remove('error');
+    textAreaComment.classList.remove('error');
+  }
+});
   </script>
 </html>
