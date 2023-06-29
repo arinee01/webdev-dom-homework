@@ -7,52 +7,10 @@
   </head>
 
   <body>
-    
-    </div>
     <div class="container">
-      <ul class="comments">
-        <li class="comment">
-          <div class="comment-header">
-            <div class="comment-user-name">Глеб Фокин</div>
-            <div class="comment-date">12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button data-like="0" class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div class="comment-user-name">Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button data-like="0" class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
-      </ul>
-      <p class="loading">Комментарии загружаются...</p>
+      <ul class="comments"></ul>
       <div class="add-form">
-        <input
-          type="text"
-          class="add-form-name"
-          placeholder="Введите ваше имя"
-        />
+        <input type="text" class="add-form-name" placeholder="Введите ваше имя" />
         <textarea
           type="textarea"
           class="add-form-text"
@@ -60,193 +18,15 @@
           rows="4"
         ></textarea>
         <div class="add-form-row">
-          <button class="add-form-button">Написать</button>
+          <button disabled class="add-form-button">Написать</button>
         </div>
       </div>
     </div>
   </body>
-  <script>
-    const buttonNewComment = document.querySelector('.add-form-button');
-    const comment = document.querySelector('.comment');
-    const boxComments = document.querySelector('.comments');
-    const inputName = document.querySelector('.add-form-name');
-    const textAreaComment = document.querySelector('.add-form-text');
-    const boxCommentsTexts = boxComments.querySelectorAll('.comment');
-    const addForm = document.querySelector('.add-form');
-    const loading = document.querySelector('.loading');
-    let now = new Date();
 
-    let userComments = [];
-
-    function getApi() {
-      if (userComments.length === 0) {
-    loading.style.display = 'block';
-    addForm.style.display = 'none';
-  }
-        return fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
-        method: "GET"
-      })
-
-      .then((response) => {
-        return response.json();
-      })
-
-      .then((responseData) => {
-        const appComments = responseData.comments.map((comment) => {
-            return {
-              name: comment.author.name,
-              date: new Date(comment.date).toLocaleString().slice(0,-3),
-              text: comment.text,
-              likes: comment.likes,
-              isLiked: false,
-            };
-          });
-          userComments = appComments;
-          console.log(userComments);
-          renderComments();
-          loading.style.display = 'none';
-    addForm.style.display = 'block';
-      }) 
-    ;
-    }
-
-    getApi();
-
-    const addLike = (e) => {
-      const comment = userComments[e.target.dataset.id];
-      comment.likes++;
-      comment.Iliked = true;
-    }
-
-    const delLike = (e) => {
-      const comment = userComments[e.target.dataset.id];
-      comment.likes--;
-      comment.Iliked = false;
-    }
-    
-    const initLikeClick = () => {
-      const likeClickElems = document.querySelectorAll('.likes');
-      for (likeClickElem of likeClickElems) {
-        likeClickElem.addEventListener('click', (e) => {
-          e.stopPropagation();
-          (userComments[e.target.dataset.id].Iliked) ? delLike(e) : addLike(e);
-          renderComments();
-        })
-      }
-    }
-
-    // Первый вариан ответа на коммент
-    const answerComment = () => {
-      const boxCommentsTexts = document.querySelectorAll('.comment');
-      boxCommentsTexts.forEach((comment) => {
-        comment.addEventListener('click', (e) => {
-          const author = comment.querySelector('.comment-header div:first-child').textContent;
-          const text = comment.querySelector('.comment-text').textContent;
-          textAreaComment.value = `@${author} \n\n > ${text}, `;
-        });
-      });
-    }
-    answerComment();
-
-    const renderComments = () => {
-      const commentHtml = userComments.map((comment,index) => {
-        (comment.Iliked) ? Iliked = '-active-like' : Iliked = '';
-        return `<li class="comment">
-          <div class="comment-header">
-            <div class="comment-user-name">${comment.name}</div>
-            <div class="comment-date">${comment.date}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${comment.text}
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">${comment.likes}</span>
-              <button class="like-button ${Iliked}" data-id='${index}'></button>
-            </div>
-          </div>
-        </li>`;
-      }).join('');
-
-      boxComments.innerHTML = commentHtml;
-      initLikeClick();
-      answerComment();
-    }
-
-    renderComments();
-
-    const addComment = () => {
-      buttonNewComment.disabled = true;
-      buttonNewComment.textContent = "Элемент добавлятся...";
-      // Пример, код выше, переписанный на цепочку промисов:
-      const fetchPromise = fetch("https://webdev-hw-api.vercel.app/api/v1/alex-toporov/comments", {
-        method: "POST",
-        body: JSON.stringify({
-          id: 1,
-          date: `${now.toLocaleString().slice(0,-3)}`,
-          likes: 0,
-          isLiked: false,
-          text: `${textAreaComment.value
-          .replaceAll('<', '&lt;')
-          .replaceAll('<', '&gt;')}`,
-          name: inputName.value
-          .replaceAll('<', '&lt;')
-          .replaceAll('<', '&gt;'), 
-          })
-        })
-
-        .then((response) => {
-          return response.json();
-        })
-
-        .then((responseData) => {
-    const newComment = {
-      name: responseData.comment.author.name,
-      date: new Date(responseData.comment.date).toLocaleString().slice(0,-3),
-      text: responseData.comment.text,
-      likes: responseData.comment.likes,
-      isLiked: false,
-    };
-    userComments.push(newComment); // добавляем новый комментарий в массив
-    return userComments;
-  })
-
-  .then(() => {
-    renderComments();
-  })
-
-  .catch((error) => {
-    console.error(error);
-  })
-
-  .then(() => {
-    buttonNewComment.disabled = false;
-    buttonNewComment.textContent = "Добавить";
-    getApi();
-  });
-  
-  inputName.value = '';
-  textAreaComment.value = '';
-};
-
-
-    buttonNewComment.addEventListener('click', function () {
-      let oldComments = boxComments.innerHTML;
-
-      if (inputName.value === '') {
-        inputName.classList.add('error');
-        return;
-      } if (textAreaComment.value === '') {
-        textAreaComment.classList.add('error');
-        return;
-      } else {
-      
-        addComment();
-        inputName.classList.remove('error');
-        textAreaComment.classList.remove('error');
-        }
-    });
-  </script>
+  <script type="module" src="./js/data.js"></script>
+  <script type="module" src="./js/api.js"></script>
+  <script type="module" src="./js/Comment.js"></script>
+  <script type="module" src="./js/CommentForm.js"></script>
+  <script type="module" src="./js/index.js"></script>
 </html>
